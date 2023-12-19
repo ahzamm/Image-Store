@@ -7,20 +7,11 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: your_username
-      MONGO_INITDB_ROOT_PASSWORD: your_password
+      MONGO_INITDB_ROOT_USERNAME: dev_user
+      MONGO_INITDB_ROOT_PASSWORD: dev_password
     volumes:
       - mongodb-data:/data/db
 
-  adminmongo:
-    image: mrvautin/adminmongo
-    container_name: my-adminmongo
-    ports:
-      - "1234:1234"
-    environment:
-      - HOST=0.0.0.0
-    depends_on:
-      - mongodb
 
 volumes:
   mongodb-data:
