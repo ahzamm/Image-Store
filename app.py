@@ -33,6 +33,12 @@ class MongoDBClient:
             if image:
                 images.append(image)
         return images
+    
+    def delete_one(self, vector_id):
+        file = self.fs.find_one({'vector_id': str(vector_id)})
+        if file:
+            self.fs.delete(file._id)
+
 
     def close(self):
         self.client.close()
@@ -76,6 +82,15 @@ class ImageStoreApp:
                 return response
             else:
                 return "No images found", 404
+            
+        @self.app.route('/delete-photo/', methods=['GET'])
+        def delete_image():
+            vector_id = request.args.get('vector_id')
+            if not vector_id:
+                return "No vector_id provided", 400
+            self.db_client.delete_one(vector_id)
+            return "Image deleted successfully", 200
+
 
     def run(self, debug=False):
         self.app.run(debug=debug)
