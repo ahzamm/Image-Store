@@ -1,22 +1,15 @@
+import abc
 import zipfile
 from io import BytesIO
 
-from flask import Flask, request, send_file
+from flask import Flask, Response, request
 from gridfs import GridFS
 from pymongo import MongoClient
-from flask import Response
 
 
-class MongoDBClient:
-    def __init__(self, uri, db_name, collection_name):
-        self.client = MongoClient(uri)
-        self.db = self.client[db_name]
-        self.fs = GridFS(self.db, collection_name)
-
-    def store_file(self, file, vector_id, filename):
-        self.fs.put(file, vector_id=vector_id, filename=filename)
-
-    def str_to_lst(self, input_str):
+class StringParser:
+    @staticmethod
+    def str_to_lst(input_str):
         try:
             numbers_str = input_str.strip('[]').replace(' ', '')
             numbers_list = [int(num) for num in numbers_str.split(',')]
@@ -25,23 +18,51 @@ class MongoDBClient:
             print(f"Error: {e}")
             return None
 
+
+class DatabaseClient(abc.ABC):
+    @abc.abstractmethod
+    def store_file(self, file, vector_id, filename):
+        pass
+
+    @abc.abstractmethod
     def get_files(self, vector_ids):
-        vector_ids = self.str_to_lst(vector_ids)
+        pass
+
+    @abc.abstractmethod
+    def delete_one(self, vector_id):
+        pass
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
+
+class MongoDBClient(DatabaseClient):
+    def __init__(self, uri, db_name, collection_name):
+        self.client = MongoClient(uri)
+        self.db = self.client[db_name]
+        self.fs = GridFS(self.db, collection_name)
+
+    def store_file(self, file, vector_id, filename):
+        self.fs.put(file, vector_id=vector_id, filename=filename)
+
+    def get_files(self, vector_ids):
+        vector_ids = StringParser.str_to_lst(vector_ids)
         images = []
         for vector_id in vector_ids:
             image = self.fs.find_one({'vector_id': str(vector_id)})
             if image:
                 images.append(image)
         return images
-    
+
     def delete_one(self, vector_id):
         file = self.fs.find_one({'vector_id': str(vector_id)})
         if file:
             self.fs.delete(file._id)
 
-
     def close(self):
         self.client.close()
+
 
 class ImageStoreApp:
     def __init__(self, db_client):
@@ -82,7 +103,7 @@ class ImageStoreApp:
                 return response
             else:
                 return "No images found", 404
-            
+
         @self.app.route('/delete-photo/', methods=['GET'])
         def delete_image():
             vector_id = request.args.get('vector_id')
@@ -91,9 +112,9 @@ class ImageStoreApp:
             self.db_client.delete_one(vector_id)
             return "Image deleted successfully", 200
 
-
     def run(self, debug=False):
         self.app.run(debug=debug)
+
 
 if __name__ == '__main__':
     db_client = MongoDBClient('mongodb://dev_user:dev_password@localhost:27017/', 'image_store', 'files')
