@@ -58,17 +58,19 @@ class ImageStoreApp:
                 response.headers["Content-Disposition"] = (
                     "attachment; filename=images.zip"
                 )
-                return response
+
+                return {"success": "true", "response": response}
             else:
-                return "No images found", 404
+                return {"success": "false", "message": "No images found"}, 400
 
         @self.app.route("/delete-photo/", methods=["GET"])
         def delete_image():
             vector_id = request.args.get("vector_id")
             if not vector_id:
-                return "No vector_id provided", 400
+                return {"success": "false", "message": "No vector_id provided"}, 400
+
             self.db_client.delete_one(vector_id)
-            return "Image deleted successfully", 200
+            return {"success": "false", "message": "Image deleted successfully"}, 200
 
     def run(self, debug=False):
         self.app.run(debug=debug)
