@@ -92,7 +92,7 @@ class ImageStoreApp:
 
             self.db_client.store_file(file, vector_id, filename)
             return {
-                "success": "false",
+                "success": "true",
                 "message": "Image successfully stored in MongoDB",
             }, 200
 
@@ -102,6 +102,7 @@ class ImageStoreApp:
             images = self.db_client.get_files(vector_ids)
             if images:
                 memory_file = BytesIO()
+
                 with zipfile.ZipFile(memory_file, "w") as zf:
                     for i, image in enumerate(images):
                         data = zipfile.ZipInfo(
@@ -109,6 +110,7 @@ class ImageStoreApp:
                         )  # assuming the image is in JPEG format
                         data.compress_type = zipfile.ZIP_DEFLATED
                         zf.writestr(data, image.read())
+
                 memory_file.seek(0)
                 response = Response(memory_file, mimetype="application/zip")
                 response.headers["Content-Disposition"] = (
