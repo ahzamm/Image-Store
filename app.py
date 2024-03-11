@@ -78,17 +78,23 @@ class ImageStoreApp:
                 or "vector_id" not in request.form
                 or "filename" not in request.form
             ):
-                return "Invalid request format", 400
+                return {"success": "false", "message": "Invalid request format"}, 400
 
             file = request.files["image"]
             vector_id = request.form["vector_id"]
             filename = request.form["filename"]
 
             if file.filename == "" or vector_id == "" or filename == "":
-                return "Incomplete data in the request", 400
+                return {
+                    "success": "false",
+                    "message": "Incomplete data in the request",
+                }, 400
 
             self.db_client.store_file(file, vector_id, filename)
-            return "Image successfully stored in MongoDB"
+            return {
+                "success": "false",
+                "message": "Image successfully stored in MongoDB",
+            }, 200
 
         @self.app.route("/retrieve-photos/", methods=["GET"])
         def get_images():
