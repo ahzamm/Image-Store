@@ -17,6 +17,7 @@ class ImageStoreApp:
         def upload_image():
             if (
                 "image" not in request.files
+                or "user_id" not in request.form
                 or "vector_id" not in request.form
                 or "filename" not in request.form
             ):
@@ -25,14 +26,20 @@ class ImageStoreApp:
             file = request.files["image"]
             vector_id = request.form["vector_id"]
             filename = request.form["filename"]
+            user_id = request.form["user_id"]
 
-            if file.filename == "" or vector_id == "" or filename == "":
+            if (
+                file.filename == ""
+                or user_id == ""
+                or vector_id == ""
+                or filename == ""
+            ):
                 return {
                     "success": "false",
                     "message": "Incomplete data in the request",
                 }, 400
 
-            self.db_client.store_file(file, vector_id, filename)
+            self.db_client.store_file(file, user_id, vector_id, filename)
             return {
                 "success": "true",
                 "message": "Image successfully stored in MongoDB",

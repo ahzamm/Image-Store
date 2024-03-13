@@ -22,8 +22,8 @@ class MongoDBClient(DatabaseClient):
         self.db = self.client[db_name]
         self.fs = GridFS(self.db, collection_name)
 
-    def store_file(self, file, vector_id, filename):
-        self.fs.put(file, vector_id=vector_id, filename=filename)
+    def store_file(self, file, user_id, vector_id, filename):
+        self.fs.put(file, user_id=user_id, vector_id=vector_id, filename=filename)
 
     def get_files(self, vector_ids):
         vector_ids = StringParser.str_to_lst(vector_ids)

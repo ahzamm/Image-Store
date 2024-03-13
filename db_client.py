@@ -3,7 +3,7 @@ import abc
 
 class DatabaseClient(abc.ABC):
     @abc.abstractmethod
-    def store_file(self, file, vector_id, filename):
+    def store_file(self, user_id, file, vector_id, filename):
         pass
 
     @abc.abstractmethod
