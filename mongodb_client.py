@@ -33,6 +33,10 @@ class MongoDBClient(DatabaseClient):
             if image:
                 images.append(image)
         return images
+    
+    def get_user_images(self, user_id):
+        images = self.fs.find({"user_id": user_id})
+        return images
 
     def delete_one(self, vector_id):
         file = self.fs.find_one({"vector_id": str(vector_id)})

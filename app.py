@@ -1,7 +1,9 @@
+import base64
+import io
 import zipfile
 from io import BytesIO
 
-from flask import Flask, Response, request
+from flask import Flask, Response, jsonify, request
 
 from mongodb_client import MongoDBClient
 
@@ -45,6 +47,17 @@ class ImageStoreApp:
                 "message": "Image successfully stored in MongoDB",
             }, 200
 
+        @self.app.route("/retrieve-all-photos/", methods=["GET"])
+        def get_all_images():
+            user_id = request.args.get("user_id")
+            images = self.db_client.get_user_images(user_id)
+            images_base64 = []
+            for image in images:
+                image_bytes = image.read()
+                image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+                images_base64.append(image_base64)
+            return jsonify(images_base64)
+
         @self.app.route("/retrieve-photos/", methods=["GET"])
         def get_images():
             vector_ids = request.args.get("vector_ids")
@@ -79,8 +92,8 @@ class ImageStoreApp:
             self.db_client.delete_one(vector_id)
             return {"success": "false", "message": "Image deleted successfully"}, 200
 
-    def run(self, debug=False):
-        self.app.run(debug=debug)
+    def run(self, port=5001, debug=False):
+        self.app.run(port=port, debug=debug)
 
 
 if __name__ == "__main__":
