@@ -92,7 +92,7 @@ class ImageStoreApp:
             self.db_client.delete_one(vector_id)
             return {"success": "false", "message": "Image deleted successfully"}, 200
 
-    def run(self, port=5001, debug=False):
+    def run(self, port=5002, debug=False):
         self.app.run(port=port, debug=debug)
 
 
