@@ -63,26 +63,12 @@ class ImageStoreApp:
         def get_images():
             vector_ids = request.args.get("vector_ids")
             images = self.db_client.get_files(literal_eval(vector_ids))
-            if images:
-                memory_file = BytesIO()
-
-                with zipfile.ZipFile(memory_file, "w") as zf:
-                    for i, image in enumerate(images):
-                        data = zipfile.ZipInfo(
-                            f"image{i+1}.jpeg"
-                        )  # assuming the image is in JPEG format
-                        data.compress_type = zipfile.ZIP_DEFLATED
-                        zf.writestr(data, image.read())
-
-                memory_file.seek(0)
-                response = Response(memory_file, mimetype="application/zip")
-                response.headers["Content-Disposition"] = (
-                    "attachment; filename=images.zip"
-                )
-
-                return {"success": "true", "response": response}
-            else:
-                return {"success": "false", "message": "No images found"}, 400
+            images_base64 = []
+            for image in images:
+                image_bytes = image.read()
+                image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+                images_base64.append(image_base64)
+            return jsonify(images_base64)
 
         @self.app.route("/delete-photo/", methods=["GET"])
         def delete_image():
