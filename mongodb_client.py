@@ -33,7 +33,7 @@ class MongoDBClient(DatabaseClient):
             yield image
 
     def get_user_images(self, user_id):
-        images = self.fs.find({"user_id": user_id})
+        images = self.fs.find({"user_id": user_id}).sort("timestamp", -1)
         return images
 
     def delete_one(self, vector_id):
