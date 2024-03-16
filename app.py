@@ -1,6 +1,7 @@
 import base64
 import io
 import zipfile
+from ast import literal_eval
 from io import BytesIO
 
 from flask import Flask, Response, jsonify, request
@@ -61,7 +62,7 @@ class ImageStoreApp:
         @self.app.route("/retrieve-photos/", methods=["GET"])
         def get_images():
             vector_ids = request.args.get("vector_ids")
-            images = self.db_client.get_files(vector_ids)
+            images = self.db_client.get_files(literal_eval(vector_ids))
             if images:
                 memory_file = BytesIO()
 

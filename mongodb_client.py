@@ -26,14 +26,13 @@ class MongoDBClient(DatabaseClient):
         self.fs.put(file, user_id=user_id, vector_id=vector_id, filename=filename)
 
     def get_files(self, vector_ids):
-        vector_ids = StringParser.str_to_lst(vector_ids)
         images = []
         for vector_id in vector_ids:
             image = self.fs.find_one({"vector_id": str(vector_id)})
             if image:
                 images.append(image)
         return images
-    
+
     def get_user_images(self, user_id):
         images = self.fs.find({"user_id": user_id})
         return images
