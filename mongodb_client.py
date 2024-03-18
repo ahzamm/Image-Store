@@ -34,7 +34,8 @@ class MongoDBClient(DatabaseClient):
 
     def get_user_images(self, user_id):
         images = self.fs.find({"user_id": user_id}).sort("timestamp", -1)
-        return images
+        images_vector_ids = [{"image": image, "vector_id": image.vector_id} for image in images]
+        return images_vector_ids
 
     def delete_one(self, vector_id):
         file = self.fs.find_one({"vector_id": str(vector_id)})
