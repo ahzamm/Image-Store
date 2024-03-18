@@ -72,7 +72,7 @@ class ImageStoreApp:
                 images_base64.append(image_base64)
             return jsonify(images_base64)
 
-        @self.app.route("/delete-photo/", methods=["GET"])
+        @self.app.route("/delete-photo/", methods=["DELETE"])
         def delete_image():
             vector_id = request.args.get("vector_id")
             if not vector_id:
