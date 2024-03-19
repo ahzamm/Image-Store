@@ -27,14 +27,15 @@ class MongoDBClient(DatabaseClient):
         self.fs.put(file, user_id=user_id, vector_id=vector_id, filename=filename)
 
     def get_files(self, vector_ids):
-       for vector_id in vector_ids:
-        image = self.fs.find_one({"vector_id": str(vector_id)})
-        if image:
-            yield image
+        for vector_id in vector_ids:
+            image = self.fs.find_one({"vector_id": str(vector_id)})
+            yield {"image": image, "vector_id": image.vector_id}
 
     def get_user_images(self, user_id):
         images = self.fs.find({"user_id": user_id}).sort("timestamp", -1)
-        images_vector_ids = [{"image": image, "vector_id": image.vector_id} for image in images]
+        images_vector_ids = [
+            {"image": image, "vector_id": image.vector_id} for image in images
+        ]
         return images_vector_ids
 
     def delete_one(self, vector_id):

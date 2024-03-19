@@ -64,12 +64,14 @@ class ImageStoreApp:
         @self.app.route("/retrieve-photos/", methods=["GET"])
         def get_images():
             vector_ids = request.args.get("vector_ids")
-            images = self.db_client.get_files(literal_eval(vector_ids))
+            images_vector_ids = self.db_client.get_files(literal_eval(vector_ids))
             images_base64 = []
-            for image in images:
-                image_bytes = image.read()
+            for image_dict in images_vector_ids:
+                image_bytes = image_dict["image"].read()
                 image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-                images_base64.append(image_base64)
+                images_base64.append(
+                    {"image": image_base64, "vector_id": image_dict["vector_id"]}
+                )
             return jsonify(images_base64)
 
         @self.app.route("/delete-photo/", methods=["DELETE"])
