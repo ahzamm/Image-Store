@@ -82,6 +82,19 @@ class ImageStoreApp:
 
             self.db_client.delete_one(vector_id)
             return {"success": "false", "message": "Image deleted successfully"}, 200
+        
+        @self.app.route("/check-vector", methods=["GET"])
+        def check_ids():
+            try:
+                vector_id = request.args.get("vector_id")
+                if not vector_id:
+                    return {"success": "false", "error": "vector_id is required"}, 400
+                
+                exists = self.db_client.checkVectorId(vector_id)
+                return {"success": "true", "exists": exists}
+            except Exception as e:
+                return {"success": "false", "error": str(e)}, 500
+
 
     def run(self, port=5002, debug=False):
         self.app.run(port=port, debug=debug)

@@ -43,5 +43,9 @@ class MongoDBClient(DatabaseClient):
         if file:
             self.fs.delete(file._id)
 
+    def check_ids(self, id):
+        file = self.fs.find_one({"vector_id": str(id)})
+        return file is not None
+
     def close(self):
         self.client.close()
