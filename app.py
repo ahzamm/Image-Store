@@ -90,7 +90,7 @@ class ImageStoreApp:
                 if not vector_id:
                     return {"success": "false", "error": "vector_id is required"}, 400
                 
-                exists = self.db_client.checkVectorId(vector_id)
+                exists = self.db_client.check_ids(vector_id)
                 return {"success": "true", "exists": exists}
             except Exception as e:
                 return {"success": "false", "error": str(e)}, 500
